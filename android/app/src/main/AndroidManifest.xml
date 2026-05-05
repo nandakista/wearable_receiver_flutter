@@ -32,7 +32,7 @@
             android:value="2" />
 
         <service
-            android:name=".WearMessageService"
+            android:name=".WearableMessageService"
             android:exported="true">
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.BIND_LISTENER"/>
