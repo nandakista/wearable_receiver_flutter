@@ -9,27 +9,80 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool isLoading = false;
   final bool connectionStatus = false;
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("Flutter Wearable Receiver")),
-      body: Center(
-        child: Column(
-          spacing: 12,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text('Connection Status: $connectionStatus'),
-            ElevatedButton(
-              onPressed: () async {
-                WatchListener.sendNextToApi();
-              },
-              child: Text("Send to API"),
-            ),
-          ],
+  void initState() {
+    super.initState();
+
+    WatchListener.onNextCallback = () async {
+      await handleNextFromWatch();
+    };
+  }
+
+  Future<void> handleNextFromWatch() async {
+    setState(() => isLoading = true);
+
+    try {
+      await Future.delayed(Duration(seconds: 2));
+      // final response = await http.post(
+      //   Uri.parse('https://your-api.com/step'),
+      //   body: '{"action":"next"}',
+      // );
+
+      if (!mounted) return;
+
+      setState(() => isLoading = false);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("✅ Next berhasil"),
         ),
-      ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() => isLoading = false);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("❌ Gagal kirim"),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Scaffold(
+          appBar: AppBar(title: Text("Flutter Wearable Receiver")),
+          body: Center(
+            child: Column(
+              spacing: 12,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Connection Status: $connectionStatus'),
+                ElevatedButton(
+                  onPressed: () async {
+                    handleNextFromWatch();
+                  },
+                  child: Text("Send to API"),
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (isLoading)
+          Container(
+            color: Colors.black54,
+            child: const Center(
+              child: CircularProgressIndicator(),
+            ),
+          ),
+      ],
     );
   }
 }
