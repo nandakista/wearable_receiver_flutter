@@ -1,4 +1,4 @@
-import 'package:explore_wearable_flutter_receiver/watch_listener.dart';
+import 'package:explore_wearable_flutter_receiver/wearable_listener.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -9,6 +9,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  String status = "Connecting...";
   bool isLoading = false;
   final bool connectionStatus = false;
 
@@ -16,12 +17,23 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
 
-    WatchListener.onNextCallback = () async {
-      await handleNextFromWatch();
+    WearableListener.onNextCallback = () async {
+      await sendToAPI();
+    };
+
+    WearableListener.onConnectionChanged = (devices) {
+      setState(() {
+        if (devices.isEmpty) {
+          status = "🔴 Not connected";
+        } else {
+          final deviceNames = devices.map((d) => d.deviceName).join(", ");
+          status = "🟢 Connected to: $deviceNames";
+        }
+      });
     };
   }
 
-  Future<void> handleNextFromWatch() async {
+  Future<void> sendToAPI() async {
     setState(() => isLoading = true);
 
     try {
@@ -35,21 +47,17 @@ class _HomePageState extends State<HomePage> {
 
       setState(() => isLoading = false);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("✅ Next berhasil"),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("✅ Simulate push berhasil")));
     } catch (e) {
       if (!mounted) return;
 
       setState(() => isLoading = false);
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("❌ Gagal kirim"),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("❌ Gagal kirim")));
     }
   }
 
@@ -64,10 +72,10 @@ class _HomePageState extends State<HomePage> {
               spacing: 12,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text('Connection Status: $connectionStatus'),
+                Text(status),
                 ElevatedButton(
                   onPressed: () async {
-                    handleNextFromWatch();
+                    sendToAPI();
                   },
                   child: Text("Send to API"),
                 ),
@@ -78,9 +86,7 @@ class _HomePageState extends State<HomePage> {
         if (isLoading)
           Container(
             color: Colors.black54,
-            child: const Center(
-              child: CircularProgressIndicator(),
-            ),
+            child: const Center(child: CircularProgressIndicator()),
           ),
       ],
     );

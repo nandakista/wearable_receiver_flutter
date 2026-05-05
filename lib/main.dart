@@ -1,11 +1,11 @@
-import 'package:explore_wearable_flutter_receiver/watch_listener.dart';
+import 'package:explore_wearable_flutter_receiver/wearable_listener.dart';
 import 'package:flutter/material.dart';
 
 import 'home_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await WatchListener.init();
+  await WearableListener.init();
   runApp(const MyApp());
 }
 

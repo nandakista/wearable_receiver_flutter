@@ -4,7 +4,7 @@ import android.content.Intent
 import android.util.Log
 import com.google.android.gms.wearable.*
 
-class WearMessageService : WearableListenerService() {
+class WearableMessageService : WearableListenerService() {
     override fun onMessageReceived(messageEvent: MessageEvent) {
         Log.d("PHONE_APP", "onMessageReceived path: ${messageEvent.path}")
         if (messageEvent.path == "/next_step") {

@@ -15,6 +15,8 @@ class MainActivity : FlutterActivity() {
     private var receiver: BroadcastReceiver? = null
     private var methodChannel: MethodChannel? = null
 
+    private var connectionMonitor: WearableConnectionMonitor? = null
+
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
 
@@ -26,6 +28,11 @@ class MainActivity : FlutterActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        connectionMonitor = WearableConnectionMonitor(this) { devices ->
+            methodChannel?.invokeMethod("connectionStatus", devices)
+        }
+        connectionMonitor?.start()
 
         receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context?, intent: Intent?) {
@@ -59,5 +66,6 @@ class MainActivity : FlutterActivity() {
         receiver?.let {
             unregisterReceiver(it)
         }
+        connectionMonitor?.stop()
     }
 }
