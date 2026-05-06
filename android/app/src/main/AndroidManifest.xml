@@ -1,4 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
     <application
         android:label="explore_wearable_flutter_receiver"
         android:name="${applicationName}"
@@ -32,7 +34,7 @@
             android:value="2" />
 
         <service
-            android:name=".WearableMessageService"
+            android:name=".WearableMessageLisneter"
             android:exported="true">
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.BIND_LISTENER"/>

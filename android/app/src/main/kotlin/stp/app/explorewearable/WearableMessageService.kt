@@ -1,20 +1,41 @@
 package stp.app.explorewearable
 
-import android.content.Intent
+import android.content.Context
 import android.util.Log
-import com.google.android.gms.wearable.*
+import com.google.android.gms.wearable.Wearable
 
-class WearableMessageService : WearableListenerService() {
-    override fun onMessageReceived(messageEvent: MessageEvent) {
-        Log.d("PHONE_APP", "onMessageReceived path: ${messageEvent.path}")
-        if (messageEvent.path == "/next_step") {
-            val dataString = String(messageEvent.data)
-            Log.d("PHONE_APP", "Message content: $dataString")
+object WearableMessageService {
 
-            val intent = Intent("NEXT_STEP_EVENT")
-            intent.setPackage(packageName) // Ensure only this app receives the broadcast
-            intent.putExtra("data", dataString)
-            sendBroadcast(intent)
-        }
+    private const val TAG = "WearableMessageService"
+
+    fun sendMessage(
+        context: Context,
+        path: String,
+        message: String
+    ) {
+        Wearable.getNodeClient(context).connectedNodes
+            .addOnSuccessListener { nodes ->
+
+                if (nodes.isEmpty()) {
+                    Log.e(TAG, "No connected wear devices")
+                    return@addOnSuccessListener
+                }
+
+                for (node in nodes) {
+                    Log.d(TAG, "Sending to node: ${node.displayName}")
+
+                    Wearable.getMessageClient(context)
+                        .sendMessage(node.id, path, message.toByteArray())
+                        .addOnSuccessListener {
+                            Log.d(TAG, "Message sent success")
+                        }
+                        .addOnFailureListener {
+                            Log.e(TAG, "Message failed: ${it.message}")
+                        }
+                }
+            }
+            .addOnFailureListener {
+                Log.e(TAG, "Node fetch failed: ${it.message}")
+            }
     }
 }

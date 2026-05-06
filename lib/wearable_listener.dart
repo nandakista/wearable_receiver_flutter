@@ -3,6 +3,8 @@ import 'dart:developer';
 import 'package:explore_wearable_flutter_receiver/watch_device_data.dart';
 import 'package:flutter/services.dart';
 
+import 'notification_service.dart';
+
 class WearableListener {
   static const _channel = MethodChannel('watch_channel');
 
@@ -35,6 +37,7 @@ class WearableListener {
 
       if (call.method == 'onNext') {
         log("📩 Event dari watch diterima");
+        await NotificationService.triggerNotificationForAndroid();
         onNextCallback?.call();
       }
     });

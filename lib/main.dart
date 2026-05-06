@@ -2,10 +2,13 @@ import 'package:explore_wearable_flutter_receiver/wearable_listener.dart';
 import 'package:flutter/material.dart';
 
 import 'home_page.dart';
+import 'notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await WearableListener.init();
+  await NotificationService.init();
+  await NotificationService.requestPermission();
   runApp(const MyApp());
 }
 

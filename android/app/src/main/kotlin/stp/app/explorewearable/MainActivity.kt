@@ -24,6 +24,17 @@ class MainActivity : FlutterActivity() {
             flutterEngine.dartExecutor.binaryMessenger,
             CHANNEL
         )
+
+        methodChannel?.setMethodCallHandler { call, result ->
+            if (call.method == "sendToWatch") {
+                val message = call.argument<String>("message") ?: ""
+                val path = call.argument<String>("path") ?: "/notify"
+                WearableMessageService.sendMessage(this, path, message)
+                result.success(null)
+            } else {
+                result.notImplemented()
+            }
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

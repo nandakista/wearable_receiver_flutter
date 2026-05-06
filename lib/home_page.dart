@@ -1,6 +1,8 @@
 import 'package:explore_wearable_flutter_receiver/wearable_listener.dart';
 import 'package:flutter/material.dart';
 
+import 'notification_service.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -78,6 +80,12 @@ class _HomePageState extends State<HomePage> {
                     sendToAPI();
                   },
                   child: Text("Send to API"),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    await NotificationService.triggerNotification();
+                  },
+                  child: Text("Push Notif"),
                 ),
               ],
             ),
